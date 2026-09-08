@@ -268,26 +268,53 @@ function afficherTrajets() {
 function acheterTicket() {
     let passgName = pr('Nom du passager : ');
     let idTrajet = parseInt(pr('Identifiant du trajet : '));
-
+    
+    let isSeat = true;
     let exist = false;
     for(let trj of trips){
-        if(trj.id === idTrajet && trj.availableSeats >= 1){
+        if(trj.id === idTrajet){
             exist = true;
             break;
         }
     }
-    if(exist){
-        tickets[tickets.length]  = new Tickets(id, passgName, tripId, seatNumber, price);
+    if(exist && parseInt(trips[idTrajet].availableSeats) <= 0){
+        exist = false;
+        isSeat = false;
     }
+    if(exist){
+        let id;
+        if(tickets.length === 0){
+            id = 1;
+        }else{
+            id = parseInt(tickets[tickets.length - 1].id) + 1;
+        }
+
+        let seatNumber = 51 - trips[idTrajet].availableSeats;
+        trips[idTrajet - 1].availableSeats -= 50;
+        let price = trips[idTrajet].price;
+
+        tickets[tickets.length]  = new Tickets(id, passgName, idTrajet, seatNumber, price);
+        return main(` +tickets ${id} success !!`);
+    }else if(isSeat) {
+        main('<<<- Trajet not found ->>>');
+    }else{
+        main('-!OH!-No Available Seats')
+    }
+
 };
-
-function Tickets(){
-
+// Tickets(id, passgName, idTrajet, seatNumber, price)
+function Tickets(id, passgName, idTrajet, seatNumber, price){
+    this.id = id;
+    this.passengerName = passgName;
+    this.tripId = idTrajet;
+    this.seatNumber = seatNumber;
+    this.price = price;
 }
 
 
 
-function main() {
+function main(messag) {
+    if(messag)cllg(messag);
     let choix = affichMenu();
     cllg(choix);
     arryOfFunc[choix]();
