@@ -206,8 +206,6 @@ const menuMessage = [
 ];
 
 
-function filtrerTrajets() {
-}
 
 function trierTrajets() {
 }
@@ -376,10 +374,10 @@ function afficherTickets() {
         tickets.forEach(ele => {
 
             let txt = `
-                \nTicket #${ele.id}
-                \nPassager : ${ele.passengerName}
-                \nTrajet : ${trips[ele.tripId].departure} → ${trips[ele.tripId].destination}
-                \nPlace : ${ele.seatNumber}
+            \nTicket #${ele.id}
+            \nPassager : ${ele.passengerName}
+            \nTrajet : ${trips[ele.tripId].departure} → ${trips[ele.tripId].destination}
+            \nPlace : ${ele.seatNumber}
             \nPrix : ${ele.price} DH
             `;
 
@@ -391,9 +389,7 @@ function afficherTickets() {
 }
 
 function annulerTicket() {
-    let idq = parseInt(
-        pr('Identifiant du ticket : ')
-    );
+    let idq = parseInt(pr('Identifiant du ticket : '));
 
     const index = tickets.findIndex(
         obj => obj.id === idq
@@ -460,6 +456,23 @@ function rechercherTicket() {
     return main(message);
 
 
+}
+
+function filtrerTrajets() {
+    cllg('===== Filtrer les trajets =====\n');
+
+    let vill = pr('Ville de départ : ');
+    let found = 'ville does not have any departure trip';
+    for (let itm in trips) {
+        if (trips[itm].departure === vill) {
+            if (found === 'ville does not have any departure trip') {
+                cllg('\n===== Results =====');
+            }
+            cllg(`${trips[itm].departure} --> ${trips[itm].destination} : ${trips[itm].price}`);
+            found = '\nThat is all.';
+        }
+    }
+    return main(found);
 }
 
 function main(messag) {
