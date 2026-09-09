@@ -1,12 +1,11 @@
-const pr = require('prompt-sync')();
+const pr = require('prompt-sync')()
 
 function cllg(txt) {
-    console.log(txt);
+    console.log(txt)
 }
-
 function clr() {
     console.clear();
-}
+};
 
 const trips = [
     {
@@ -205,12 +204,9 @@ const menuMessage = [
     "0- Quitter"
 ];
 
-
-function filtrerTrajets() {
-}
-
-function trierTrajets() {
-}
+function rechercherTicket() { };
+function filtrerTrajets() { };
+function trierTrajets() { };
 
 const arryOfFunc = [
     quitte,
@@ -224,34 +220,39 @@ const arryOfFunc = [
 ];
 
 function affichMenu() {
-    cllg('=================================');
-    cllg('=== RAILWAY MANAGER =============');
-    cllg('=================================');
+
+    cllg('=================================\n=== RAILWAY MANAGER =============\n=================================')
 
     menuMessage.forEach(elm => {
-        cllg(elm);
+        cllg(elm)
     });
 
-    cllg('\nVotre Choix :');
-
+    cllg('\nVotre Choix :')
     let choix = parseInt(pr("   >"));
 
-    while (
-        !Number.isInteger(choix) ||
-        choix < 0 ||
-        choix >= arryOfFunc.length //khtli h lant les funs
-    ) {
-        cllg('\nVotre Choix :');
+    while (arryOfFunc.length < choix || choix < 0) {
+        cllg('\nVotre Choix :')
         choix = parseInt(pr("   >"));
     }
-
     return choix;
+
 }
 
 function quitte() {
     clr();
     return;
-}
+
+};
+
+// {
+// id: 1,
+// departure: "Safi",
+// destination: "Youssoufia",
+// departureTime: "07:30",
+// arrivalTime: "08:30",
+// price: 25,
+// availableSeats: 50
+// },
 
 function AvaIDSeats(trajeId, idSeat) {
     this.id = trajeId;
@@ -260,103 +261,82 @@ function AvaIDSeats(trajeId, idSeat) {
 
 function findAvalSeat(idTrajet) {
     const index = avaIDSeats.findIndex(obj => obj.id === idTrajet);
-
-    if (
-        index === -1 ||
-        avaIDSeats[index].avalTicketIdSeat.length === 0
-    ) {
+    cllg(avaIDSeats[index]);
+    if (!avaIDSeats[index] ||
+        avaIDSeats[index].avalTicketIdSeat.length === 0) {
         return false;
     } else {
-        let id = avaIDSeats[index].avalTicketIdSeat[
-            avaIDSeats[index].avalTicketIdSeat.length - 1
-        ];
-
+        let id = avaIDSeats[index].avalTicketIdSeat[avaIDSeats[index].avalTicketIdSeat.length - 1];
         avaIDSeats[index].avalTicketIdSeat.length -= 1;
-
-        return id; //win taskoyst 
+        return id;
     }
 }
 
 function afficherTrajets() {
-    clr();
-
-    cllg("=== TRAJETS DISPONIBLES ===");
-
+    cllg("=== TRAJETS DISPONIBLES ===")
     for (let trj of trips) {
         cllg(`\n#${trj.id} ${trj.departure} → ${trj.destination}
             Départ : ${trj.departureTime}
             Arrivée : ${trj.arrivalTime}
             Prix : ${trj.price} DH
-            Places disponibles : ${trj.availableSeats}`);
+            Places disponibles : ${trj.availableSeats}`)
     }
-
     return main();
-}
+};
 
 function acheterTicket() {
     let passgName = pr('Nom du passager : ');
     let idTrajet = parseInt(pr('Identifiant du trajet : '));
+    const tripIndex = trips.findIndex(trip => trip.id === idTrajet);
 
-    const tripIndex = trips.findIndex(
-        trip => trip.id === idTrajet
-    );
-
-    let isSeat = true; // tin lblays h tran
-    let exist = tripIndex !== -1; // is nit ill tran n3d oho
-
-    if (
-        exist &&
-        trips[tripIndex].availableSeats <= 0
-    ) {
+    let isSeat = true;
+    let exist = false;
+    for (let trj of trips) {
+        if (trj.id === idTrajet) {
+            exist = true;
+            break;
+        }
+    }
+    if (exist && parseInt(trips[tripIndex].availableSeats) <= 0) {
         exist = false;
         isSeat = false;
     }
-
     if (exist) {
         let id;
-
         if (tickets.length === 0) {
             id = 1;
         } else {
             id = parseInt(tickets[tickets.length - 1].id) + 1;
         }
-
-        let seatNumber;
-
-        let seat = findAvalSeat(tripIndex);
-
-        if (seat !== false) {
+        let seatNumber; //= 51 - trips[tripIndex].availableSeats;
+        
+        let seat = findAvalSeat(idTrajet);
+        if (seat) {
             seatNumber = seat;
         } else {
+            // seatNumber = parseInt(tickets[tickets.length - 1].seatNumber) + 1;
             seatNumber = 51 - trips[tripIndex].availableSeats;
         }
 
-        trips[tripIndex].availableSeats -= 1;
 
+
+        trips[tripIndex].availableSeats -= 1;
         let price = trips[tripIndex].price;
 
-        tickets[tickets.length] = new Tickets(
-            id,
-            passgName,
-            tripIndex,
-            seatNumber,
-            price
-        );
-
-        return main(` +tickets ${id} success !!
-            \nPassager : ${tickets[tickets.length - 1].passengerName}
-            \nTrajet : ${trips[tripIndex].departure} → ${trips[tripIndex].destination}
-            \nPlace : ${tickets[tickets.length - 1].seatNumber}
-            \nPrix : ${tickets[tickets.length - 1].price} DH
+        tickets[tickets.length] = new Tickets(id, passgName, tripIndex, seatNumber, price);
+        return main(` +tickets ${id} success !!\nPassager : ${tickets[tickets.length - 1].passengerName}
+            Trajet : ${trips[tripIndex].departure} → ${trips[tripIndex].destination}
+            Place : ${tickets[tickets.length - 1].seatNumber}
+            Prix : ${tickets[tickets.length - 1].price} DH
             `);
-
     } else if (isSeat) {
         return main('<<<- Trajet not found ->>>');
     } else {
-        return main('-!OH!-No Available Seats');
+        return main('-!OH!-No Available Seats')
     }
-}
 
+};
+// Tickets(id, passgName, idTrajet, seatNumber, price)
 function Tickets(id, passgName, idTrajet, seatNumber, price) {
     this.id = id;
     this.passengerName = passgName;
@@ -365,110 +345,64 @@ function Tickets(id, passgName, idTrajet, seatNumber, price) {
     this.price = price;
 }
 
+// Ticket #2
+// Passager : Sara
+// Trajet : Safi → Youssoufia
+// Place : 1
+// Prix : 25 DH
 function afficherTickets() {
     clr();
-
-    cllg('=== TICKETS ===');
-
+    cllg('=== TICKETS ===')
     if (tickets.length === 0) {
         return main('*** Aucun ticket enregistré ***\n');
     } else {
         tickets.forEach(ele => {
-
             let txt = `
-                \nTicket #${ele.id}
-                \nPassager : ${ele.passengerName}
-                \nTrajet : ${trips[ele.tripId].departure} → ${trips[ele.tripId].destination}
-                \nPlace : ${ele.seatNumber}
+            \nTicket #${ele.id}
+            \nPassager : ${ele.passengerName}
+            \nTrajet : ${trips[ele.tripId].departure} → ${trips[ele.tripId].destination}
+            \nPlace : ${ele.seatNumber}
             \nPrix : ${ele.price} DH
             `;
-
             cllg(txt);
         });
     }
-
     return main();
-}
+
+};
 
 function annulerTicket() {
-    let idq = parseInt(
-        pr('Identifiant du ticket : ')
-    );
-
-    const index = tickets.findIndex(
-        obj => obj.id === idq
-    );
+    let idq = parseInt(pr('Identifiant du ticket : '));
+    const index = tickets.findIndex(obj => obj.id === idq);
 
     if (index > -1) {
+        trips[tickets[index].tripId].availableSeats += 1;
 
-        // tripId contains the trip array index
-        const tripIndex = tickets[index].tripId;
-
-        trips[tripIndex].availableSeats += 1;
-
-        // Find the correct trip inside avaIDSeats
-        const avaIndex = avaIDSeats.findIndex(
-            obj => obj.id === tripIndex
-        );
-
-        if (avaIndex !== -1) {
-            avaIDSeats[avaIndex].avalTicketIdSeat
-                .push(tickets[index].seatNumber);
+        if (avaIDSeats[index]) {
+            avaIDSeats[index].avalTicketIdSeat.push(tickets[index].seatNumber);
+        } else {
+            avaIDSeats[avaIDSeats.length] = new AvaIDSeats(index, tickets[index].seatNumber);
+            // cllg(avaIDSeats);
         }
 
-        else {
+        cllg(avaIDSeats);
+        
 
-            avaIDSeats[avaIDSeats.length] = new AvaIDSeats(tripIndex, tickets[index].seatNumber);
+        if (index > -1) {
+            tickets.splice(index, 1);
         }
 
-        tickets.splice(index, 1);
-
-        return main(
-            'Ticket Annuler Avec Successes '
-        );
-
+        return main('Ticket Annuler Avec Successes ')
     } else {
-
-        return main('Ticket Not Found!!!');
-    }
-}
-
-function rechercherTicket() {
-    cllg("====== Recherche =======");
-    let name = pr('Nom du passager : ');
-
-    let i = 0;
-    let message = `${name} has no tickets!!!`;
-
-    for (let itm in tickets) {
-        // cllg(tickets[itm])
-        if (tickets[itm].passengerName === name) {
-            let txt = `
-            \nTicket #${tickets[i].id}
-            \nPassager : ${tickets[i].passengerName}
-            \nTrajet : ${trips[tickets[i].tripId].departure} → ${trips[tickets[i].tripId].destination}
-            \nPlace : ${tickets[i].seatNumber}
-            \nPrix : ${tickets[i].price} DH
-            `;
-
-            cllg(txt);
-            message = "  >Done!!";
-        }
-        i++;
+        return main('Ticket Not Found!!!')
     }
 
-    return main(message);
-
-
-}
+};
 
 function main(messag) {
-    if (messag) {
-        cllg(messag);
-    }
-
+    if (messag) cllg(messag);
     let choix = affichMenu();
-
+    cllg(choix);
     arryOfFunc[choix]();
 }
 
