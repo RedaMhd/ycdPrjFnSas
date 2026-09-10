@@ -278,7 +278,7 @@ function findAvalSeat(idTrajet) {
     ) {
         return false;
     } else {
-        let id = avaIDSeats[index].[
+        let id = avaIDSeats[index].avalTicketIdSeat[
             avaIDSeats[index].avalTicketIdSeat.length - 1
         ];
 
@@ -494,6 +494,7 @@ function filtrerTrajets() {
 }
 
 
+
 function trierTrajets() {
     let trajId = [trips[0].id];
 
@@ -503,28 +504,29 @@ function trierTrajets() {
         trajId[trajId.length] = trips[idT].id;
 
         while (i >= 0) {
-            //id starts from 1 but index starts men 0 4ayna 3la nkssas 1
+                //id starts from 1 but index starts men 0 4ayna 3la nkssas 1
             if (trips[trajId[i] - 1].price > trips[trajId[i + 1] - 1].price) {
 
                 let sw = trajId[i + 1];
                 trajId[i + 1] = trajId[i];
                 trajId[i] = sw;
+
+            } else {
+                break;
             }
 
             i--;
         }
     }
 
-    // cllg(trajId);
-
     for (let idTrip = 0; idTrip < trajId.length; idTrip++) {
-
-        cllg(`${trips[trajId[idTrip] - 1].departure} --> ${trips[trajId[idTrip] - 1].destination} : ${trips[trajId[idTrip] - 1].price}`);
+        cllg(
+            `${trips[trajId[idTrip] - 1].departure} --> ${trips[trajId[idTrip] - 1].destination} : ${trips[trajId[idTrip] - 1].price}`
+        );
     }
 
     return main();
 }
-
 function main(messag) {
     // cllg(tickets)
     cllg(`Total tickets vendue : ${NombreTotalTickets}.`)
