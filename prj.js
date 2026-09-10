@@ -191,7 +191,22 @@ const trips = [
     }
 ];
 
-const tickets = [];
+const tickets = [
+    // {
+    //     id: 1,
+    //     passengerName: 'reda',
+    //     tripId: 19,
+    //     seatNumber: 1,
+    //     price: 95
+    // },
+    // {
+    //     id: 2,
+    //     passengerName: 'fdf',
+    //     tripId: 9,
+    //     seatNumber: 1,
+    //     price: 30
+    // }
+];
 let avaIDSeats = [];
 
 const menuMessage = [
@@ -223,15 +238,15 @@ function affichMenu() {
     cllg('=================================');
     cllg('=== RAILWAY MANAGER =============');
     cllg('=================================');
-    
+
     menuMessage.forEach(elm => {
         cllg(elm);
     });
-    
+
     cllg('\nVotre Choix :');
-    
+
     let choix = parseInt(pr("   >"));
-    
+
     while (
         !Number.isInteger(choix) ||
         choix < 0 ||
@@ -240,7 +255,7 @@ function affichMenu() {
         cllg('\nVotre Choix :');
         choix = parseInt(pr("   >"));
     }
-    
+
     return choix;
 }
 
@@ -256,121 +271,126 @@ function AvaIDSeats(trajeId, idSeat) {
 
 function findAvalSeat(idTrajet) {
     const index = avaIDSeats.findIndex(obj => obj.id === idTrajet);
-    
+
     if (
         index === -1 ||
         avaIDSeats[index].avalTicketIdSeat.length === 0
     ) {
         return false;
     } else {
-        let id = avaIDSeats[index].avalTicketIdSeat[
+        let id = avaIDSeats[index].[
             avaIDSeats[index].avalTicketIdSeat.length - 1
         ];
-        
+
         avaIDSeats[index].avalTicketIdSeat.length -= 1;
-        
+
         return id; //win taskoyst 
     }
 }
 
 function afficherTrajets() {
     clr();
-    
+
     cllg("=== TRAJETS DISPONIBLES ===");
-    
+
     for (let trj of trips) {
         cllg(`\n#${trj.id} ${trj.departure} → ${trj.destination}
             Départ : ${trj.departureTime}
             Arrivée : ${trj.arrivalTime}
             Prix : ${trj.price} DH
             Places disponibles : ${trj.availableSeats}`);
-        }
-        
-        return main();
     }
-    
-    function acheterTicket() {
-        let passgName = pr('Nom du passager : ');
-        let idTrajet = parseInt(pr('Identifiant du trajet : '));
-        
-        const tripIndex = trips.findIndex(
-            trip => trip.id === idTrajet
-        );
-        
-        let isSeat = true; // tin lblays h tran
-        let exist = tripIndex !== -1; // is nit ill tran n3d oho
-        
-        if (
-            exist &&
-            trips[tripIndex].availableSeats <= 0
-        ) {
-            exist = false;
-            isSeat = false;
-        }
-        
-        if (exist) {
-            let id;
 
-            if (tickets.length === 0) {
-                id = 1;
-            } else {
-                id = parseInt(tickets[tickets.length - 1].id) + 1;
-            }
-            
-            let seatNumber;
-            
-            let seat = findAvalSeat(tripIndex);
-            
-            if (seat !== false) {
-                seatNumber = seat;
-            } else {
-                seatNumber = 51 - trips[tripIndex].availableSeats;
-            }
-            
-            trips[tripIndex].availableSeats -= 1;
-            
-            let price = trips[tripIndex].price;
-            
-            tickets[tickets.length] = new Tickets(
-                id,
-                passgName,
-                tripIndex,
-                seatNumber,
-                price
-            );
-            
-            return main(` +tickets ${id} success !!
+    return main();
+}
+
+let NombreTotalTickets = 0;
+let ChiffreAffaires = 0;
+
+function acheterTicket() {
+    let passgName = pr('Nom du passager : ');
+    let idTrajet = parseInt(pr('Identifiant du trajet : '));
+
+    const tripIndex = trips.findIndex(
+        trip => trip.id === idTrajet
+    );
+
+    let isSeat = true; // tin lblays h tran
+    let exist = tripIndex !== -1; // is nit illa tran n3d oho
+
+    if (
+        exist &&
+        trips[tripIndex].availableSeats <= 0
+    ) {
+        exist = false;
+        isSeat = false;
+    }
+
+    if (exist) {
+        let id;
+
+        if (tickets.length === 0) {
+            id = 1;
+        } else {
+            id = parseInt(tickets[tickets.length - 1].id) + 1;
+        }
+
+        let seatNumber;
+
+        let seat = findAvalSeat(tripIndex);
+
+        if (seat !== false) {
+            seatNumber = seat;
+        } else {
+            seatNumber = 51 - trips[tripIndex].availableSeats;
+        }
+
+        trips[tripIndex].availableSeats -= 1;
+
+        let price = trips[tripIndex].price;
+        NombreTotalTickets += 1;
+        ChiffreAffaires += price;
+
+        tickets[tickets.length] = new Tickets(
+            id,
+            passgName,
+            tripIndex,
+            seatNumber,
+            price
+        );
+
+        return main(` +tickets ${id} success !!
                 \nPassager : ${tickets[tickets.length - 1].passengerName}
                 \nTrajet : ${trips[tripIndex].departure} → ${trips[tripIndex].destination}
                 \nPlace : ${tickets[tickets.length - 1].seatNumber}
                 \nPrix : ${tickets[tickets.length - 1].price} DH
                 `);
-                
-            } else if (isSeat) {
-                return main('<<<- Trajet not found ->>>');
-            } else {
-                return main('-!OH!-No Available Seats');
-            }
-        }
-        
-        function Tickets(id, passgName, idTrajet, seatNumber, price) {
-            this.id = id;
-            this.passengerName = passgName;
-            this.tripId = idTrajet;
-            this.seatNumber = seatNumber;
-            this.price = price;
+
+    } else if (isSeat) {
+        return main('<<<- Trajet not found ->>>');
+    } else {
+        return main('-!OH!-No Available Seats');
+    }
+}
+
+function Tickets(id, passgName, idTrajet, seatNumber, price) {
+    this.id = id;
+    this.passengerName = passgName;
+    this.tripId = idTrajet;
+    this.seatNumber = seatNumber;
+    this.price = price;
 }
 
 function afficherTickets() {
     clr();
-    
+
     cllg('=== TICKETS ===');
-    
+
     if (tickets.length === 0) {
         return main('*** Aucun ticket enregistré ***\n');
     } else {
         tickets.forEach(ele => {
-            
+
             let txt = `
             \nTicket #${ele.id}
             \nPassager : ${ele.passengerName}
@@ -378,11 +398,11 @@ function afficherTickets() {
             \nPlace : ${ele.seatNumber}
             \nPrix : ${ele.price} DH
             `;
-            
+
             cllg(txt);
         });
     }
-    
+
     return main();
 }
 
@@ -392,37 +412,37 @@ function annulerTicket() {
     const index = tickets.findIndex(
         obj => obj.id === idq
     );
-    
+
     if (index > -1) {
-        
-        // tripId contains the trip array index
+
         const tripIndex = tickets[index].tripId;
-        
+
         trips[tripIndex].availableSeats += 1;
-        
-        // Find the correct trip inside avaIDSeats
+        NombreTotalTickets -= 1;
+        ChiffreAffaires -= trips[tripIndex].price;
+
         const avaIndex = avaIDSeats.findIndex(
             obj => obj.id === tripIndex
         );
 
         if (avaIndex !== -1) {
             avaIDSeats[avaIndex].avalTicketIdSeat
-            .push(tickets[index].seatNumber);
+                .push(tickets[index].seatNumber);
         }
 
         else {
-            
+
             avaIDSeats[avaIDSeats.length] = new AvaIDSeats(tripIndex, tickets[index].seatNumber);
         }
-        
+
         tickets.splice(index, 1);
-        
+
         return main(
             'Ticket Annuler Avec Successes '
         );
-        
+
     } else {
-        
+
         return main('Ticket Not Found!!!');
     }
 }
@@ -430,10 +450,10 @@ function annulerTicket() {
 function rechercherTicket() {
     cllg("====== Recherche =======");
     let name = pr('Nom du passager : ');
-    
+
     let i = 0;
     let message = `${name} has no tickets!!!`;
-    
+
     for (let itm in tickets) {
         // cllg(tickets[itm])
         if (tickets[itm].passengerName === name) {
@@ -444,21 +464,21 @@ function rechercherTicket() {
             \nPlace : ${tickets[i].seatNumber}
             \nPrix : ${tickets[i].price} DH
             `;
-            
+
             cllg(txt);
             message = "  >Done!!";
         }
         i++;
     }
-    
+
     return main(message);
-    
-    
+
+
 }
 
 function filtrerTrajets() {
     cllg('===== Filtrer les trajets =====\n');
-    
+
     let vill = pr('Ville de départ : ');
     let found = 'ville does not have any departure trip';
     for (let itm in trips) {
@@ -483,7 +503,7 @@ function trierTrajets() {
         trajId[trajId.length] = trips[idT].id;
 
         while (i >= 0) {
-                        //id starts from 1 but index starts men 0 4ayna 3la nkssas 1
+            //id starts from 1 but index starts men 0 4ayna 3la nkssas 1
             if (trips[trajId[i] - 1].price > trips[trajId[i + 1] - 1].price) {
 
                 let sw = trajId[i + 1];
@@ -506,6 +526,11 @@ function trierTrajets() {
 }
 
 function main(messag) {
+    // cllg(tickets)
+    cllg(`Total tickets vendue : ${NombreTotalTickets}.`)
+    cllg(`Chiffre d'affaires total : ${ChiffreAffaires} DH`)
+
+
     if (messag) {
         cllg(messag);
     }
