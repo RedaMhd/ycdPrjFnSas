@@ -473,29 +473,33 @@ function filtrerTrajets() {
     return main(found);
 }
 
+
 function trierTrajets() {
     let trajId = [trips[0].id];
-    for (let idT = 1; idT < trips[trips.length]; idT++) {
-        //
+
+    for (let idT = 1; idT < trips.length; idT++) {
 
         let i = trajId.length - 1;
         trajId[trajId.length] = trips[idT].id;
 
-        while(i >= 0){
-            if (trips[trajId[i]].price > trips[trajId[i + 1]].price) {
+        while (i >= 0) {
+                        //id starts from 1 but index starts men 0 4ayna 3la nkssas 1
+            if (trips[trajId[i] - 1].price > trips[trajId[i + 1] - 1].price) {
+
                 let sw = trajId[i + 1];
                 trajId[i + 1] = trajId[i];
                 trajId[i] = sw;
             }
+
             i--;
         }
     }
-    cllg(trajId);
-    for(let idTrip = 0; idTrip < trajId.length - 1; idTrip++){
-    
-        cllg(`${trips[trajId[idTrip]].departure} --> ${trips[trajId[idTrip]].destination} : ${trips[trajId[idTrip]].price}`);
 
+    // cllg(trajId);
 
+    for (let idTrip = 0; idTrip < trajId.length; idTrip++) {
+
+        cllg(`${trips[trajId[idTrip] - 1].departure} --> ${trips[trajId[idTrip] - 1].destination} : ${trips[trajId[idTrip] - 1].price}`);
     }
 
     return main();
